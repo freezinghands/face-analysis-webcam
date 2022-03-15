@@ -1,0 +1,1 @@
+faceApiEndpointName,220308-face-emotion

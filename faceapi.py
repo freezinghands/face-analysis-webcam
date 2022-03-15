@@ -1,4 +1,4 @@
-#inference via Face API (just one time)
+#inference via Face API (this code requests to server for only one time)
 #reference: Microsoft Azure official documentation
 import asyncio
 import io
@@ -10,8 +10,6 @@ import uuid
 import requests
 from urllib.parse import urlparse
 from io import BytesIO
-# To install this module, run:
-# python -m pip install Pillow
 from PIL import Image, ImageDraw
 from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
@@ -20,13 +18,38 @@ import cv2
 
 starttime = time.time()
 
-KEY = "f84285282a604b9----------6012d88"
-ENDPOINT = "https://220308-face-emotion.cognitiveservices.azure.com/"
+
+apikeys = {}
+
+with open(os.path.join('assets', 'keys', 'apikeys.txt'), 'rt') as keyFile:
+    content = list(map(lambda x: x.split(','), keyFile.readlines()))
+    for keyname, keycontent in content:
+        apikeys[keyname.strip()] = keycontent.strip()
+
+
+applicationSettings = {}
+defaultApplicationSettings = {
+    'faceApiEndpointName': 'my-endpoint'
+}
+
+with open('settings.txt', 'rt') as settingsFile:
+    content = list(map(lambda x: x.split(','), settingsFile.readlines()))
+
+    for name, value in defaultApplicationSettings.items():  # copy default settings
+        applicationSettings[name] = value
+
+    for name, value in content:  # read settings from settings file
+        applicationSettings[name.strip()] = value.strip()
+
+
+
+KEY = apikeys['azureface']
+ENDPOINT = 'https://' + applicationSettings['faceApiEndpointName'] + '.cognitiveservices.azure.com/'
 
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 
 
-image_path = 'capture/face-20220313-085222.jpg'
+image_path = 'capture/face-20220315-221249.jpg'
 #image_name = os.path.basename(image_url)
 frame = cv2.imread(image_path)
 ret, buf = cv2.imencode('.jpg', frame)
@@ -90,6 +113,9 @@ print(f"image_face_ID: {image_face_ID}")
 print("----")
 print(detected_faces[0].face_attributes.emotion)
 print(detected_faces[0].face_attributes.quality_for_recognition)
+print(str(detected_faces[0].face_attributes.quality_for_recognition))
+qfr = str(detected_faces[0].face_attributes.quality_for_recognition).split('.')
+print(qfr)
 print("----")
 """
         outputs
