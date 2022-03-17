@@ -73,6 +73,8 @@ class AzureFaceApi:
         self.face_client = FaceClient(self.endpoint, CognitiveServicesCredentials(self.apikey))
 
     def detect_face_src(self, image_path):
+        # initialize variable in Json format, to return exception string
+        j = json.loads('{}')
         #URL = f'http://api.openweathermap.org/data/2.5/weather?lat={self.lat}&lon={self.lon}&appid={self.apikey}&lang=kr&units=metric'
         #response = requests.get(URL)
         frame = cv2.imread(image_path)
@@ -85,28 +87,35 @@ class AzureFaceApi:
             detection_model='detection_01'
         )
         if not detected_faces:
-            raise Exception('No face detected from image {}'.format(image_name))
-        else:
-            #separate string for request "qualityForRecognition"
-            qfr = str(detected_faces[0].face_attributes.quality_for_recognition).split('.')
-            j = '{}'
-            j = json.loads(j)
-            #unpacking floating point number for request "emotion"
-            ret = {}
-            ret['anger'] = detected_faces[0].face_attributes.emotion.anger
-            ret['contempt'] = detected_faces[0].face_attributes.emotion.contempt
-            ret['disgust'] = detected_faces[0].face_attributes.emotion.disgust
-            ret['fear'] = detected_faces[0].face_attributes.emotion.anger
-            ret['happiness'] = detected_faces[0].face_attributes.emotion.happiness
-            ret['neutral'] = detected_faces[0].face_attributes.emotion.neutral
-            ret['sadness'] = detected_faces[0].face_attributes.emotion.sadness
-            ret['surprise'] = detected_faces[0].face_attributes.emotion.surprise
-            ret['QualityForRecognition'] = qfr[1]
-            j.update(ret)
+            msg = {'exception': 'No face detected from image'}
+            j.update(msg)
             return j
-            #sample return - json (python dictionary object)
-            #please check in main.py that parses properly
-            """
+            #raise Exception('No face detected from image {}'.format(image_name))
+        
+        #separate string for request "qualityForRecognition"
+        qfr = str(detected_faces[0].face_attributes.quality_for_recognition).split('.')
+        
+        # if quality of output inference is not (high, medium), it is not reliable.
+        if qfr[1] != 'high' and qfr[1] != 'medium':
+            msg = {'exception': 'output emotion probabilities are not reliable'}
+            j.update(msg)
+            return j
+        
+        #unpacking floating point number for request "emotion"
+        ret = {}
+        ret['anger']        = detected_faces[0].face_attributes.emotion.anger
+        ret['contempt']     = detected_faces[0].face_attributes.emotion.contempt
+        ret['disgust']      = detected_faces[0].face_attributes.emotion.disgust
+        ret['fear']         = detected_faces[0].face_attributes.emotion.fear
+        ret['happiness']    = detected_faces[0].face_attributes.emotion.happiness
+        ret['neutral']      = detected_faces[0].face_attributes.emotion.neutral
+        ret['sadness']      = detected_faces[0].face_attributes.emotion.sadness
+        ret['surprise']     = detected_faces[0].face_attributes.emotion.surprise
+        j.update(ret)
+        return j
+        #sample return - json (python dictionary object)
+        #please check in main.py that parses properly
+        """
                 {
                     'anger': 0.0, 
                     'contempt': 0.0, 
@@ -118,6 +127,6 @@ class AzureFaceApi:
                     'surprise': 0.993, 
                     'QualityForRecognition': 'high'
                 }
-            """
+        """
 
 
