@@ -130,10 +130,10 @@ class MirrorFaceDetect:
     
     
 #check if PIR sensor is on
-while True:
-    if PIR == 0:
-        time.sleep(1)
-        continue
+# while True:
+#     if PIR == 0:
+#         time.sleep(1)
+#         continue
     #motion detected - capture 
     
 
