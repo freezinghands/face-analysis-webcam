@@ -76,8 +76,8 @@ class MirrorFaceDetect:
         # check whether face is (faces are) detected or not
             if self.appearance <= 0:
                 msg = {'exception': 'No face found'}
-                j.update(msg)
-                return j
+                print('[INFO] ' + msg['exception'])
+                continue
 
         # if yes, save the image into Jpeg format
         # and save it to capture/ directory
