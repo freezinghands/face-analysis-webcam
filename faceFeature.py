@@ -86,6 +86,13 @@ class MirrorFaceDetect:
             self.face_filename = "face-" + stamp + ".jpg"
             cv2.imwrite("capture/" + self.face_filename, frame)
 
-        # call face api and get emotion string returns, and pack into Json format
-            return self.face_api.detect_face_src('capture/' + self.face_filename)
+        # call face api and get emotion string
+            self.result = self.face_api.detect_face_src('capture/' + self.face_filename)
+            
+            if self.result['exception'] != 'null':
+                print('[INFO] ' + self.result['exception'])
+                continue
+        
+        # return and send the data into Json format
+            return self.result
 

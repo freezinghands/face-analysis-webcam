@@ -103,6 +103,8 @@ class AzureFaceApi:
         
         #unpacking floating point number for request "emotion"
         ret = {}
+        # added phrase that stances no exceptions..
+        ret['exception']    = 'null'
         ret['anger']        = detected_faces[0].face_attributes.emotion.anger
         ret['contempt']     = detected_faces[0].face_attributes.emotion.contempt
         ret['disgust']      = detected_faces[0].face_attributes.emotion.disgust
@@ -116,6 +118,7 @@ class AzureFaceApi:
         #sample return - json (python dictionary object)
         #please check in main.py that parses properly
         """
+        old results: 
                 {
                     'anger': 0.0, 
                     'contempt': 0.0, 
