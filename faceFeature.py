@@ -1,4 +1,4 @@
-#
+
 import sys
 import json
 import time
@@ -51,39 +51,41 @@ class MirrorFaceDetect:
         # if PIR == 0:
         #     time.sleep(1)
         #     continue
+        
+        while True:
         # check if time is exceeded, so that camera is not running over 60 seconds
         # if PIR sensor is available, this feature is now useful
-        if time.time() - self.stamp > 60:
-            msg = {'exception': 'Time exceeded'}
-            j.update(msg)
-            return j
+            if time.time() - self.stamp > 60:
+                msg = {'exception': 'Time exceeded'}
+                j.update(msg)
+                return j
         # if motion is detected(or be directly executed if PIR sensor is diabled), execute below
         # capture one frame from Webcam
-        ret, frame = cap.read()
-        if ret == False:
-            msg = {'exception': 'Frame capture error'}
-            j.update(msg)
-            return j
+            ret, frame = cap.read()
+            if ret == False:
+                msg = {'exception': 'Frame capture error'}
+                j.update(msg)
+                return j
         # Do actions with captured image
-        detections = detect_faces(frame)
-        self.appearance = 0
-        for i in range(0, detections.shape[2]):
-            confidence = detections[0, 0, i, 2]
-            if confidence > 0.5:
-                self.appearance += 1
+            detections = detect_faces(frame)
+            self.appearance = 0
+            for i in range(0, detections.shape[2]):
+                confidence = detections[0, 0, i, 2]
+                if confidence > 0.5:
+                    self.appearance += 1
         # check whether face is (faces are) detected or not
-        if self.appearance <= 0:
-            msg = {'exception': 'No face found'}
-            j.update(msg)
-            return j
+            if self.appearance <= 0:
+                msg = {'exception': 'No face found'}
+                j.update(msg)
+                return j
 
         # if yes, save the image into Jpeg format
         # and save it to capture/ directory
-        tm = datetime.datetime.now()
-        stamp = f"{tm:%Y%m%d-%H%M%S}"
-        self.face_filename = "face-" + stamp + ".jpg"
-        cv2.imwrite("capture/" + self.face_filename, frame)
+            tm = datetime.datetime.now()
+            stamp = f"{tm:%Y%m%d-%H%M%S}"
+            self.face_filename = "face-" + stamp + ".jpg"
+            cv2.imwrite("capture/" + self.face_filename, frame)
 
         # call face api and get emotion string returns, and pack into Json format
-        return self.face_api.detect_face_src('capture/' + self.face_filename)
+            return self.face_api.detect_face_src('capture/' + self.face_filename)
 
