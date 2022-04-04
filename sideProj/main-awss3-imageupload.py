@@ -18,7 +18,8 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
     try:
         response = s3_client.generate_presigned_url('get_object',
                                                     Params={'Bucket': bucket_name,
-                                                            'Key': object_name},
+                                                            'Key': object_name,
+                                                            'ResponseContentType': 'image/jpeg'},
                                                     ExpiresIn=expiration)
     except ClientError as e:
         logging.error(e)
@@ -44,7 +45,7 @@ def upload_file(file_name, bucket, object_name=None):
     # Upload the file
     s3_client = boto3.client('s3')
     try:
-        response = s3_client.upload_file(file_name, bucket, object_name)
+        response = s3_client.upload_file(file_name, bucket, object_name, ExtraArgs=None)
     except ClientError as e:
         logging.error(e)
         return False
@@ -70,7 +71,8 @@ if __name__ == '__main__':
         print("upload success.")
         s1 = time.time()
         # create url
-        url = create_presigned_url(bucket_name, filename)
+        # Now URL expires in 7 days
+        url = create_presigned_url(bucket_name, filename, 3600*24*7)
         print(f"filename: {filename}")
         print(f"Your url: {url}")
     else:
