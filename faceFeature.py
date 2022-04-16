@@ -1,5 +1,6 @@
 
 import sys
+import os
 import json
 import time
 import datetime
@@ -87,7 +88,7 @@ class MirrorFaceDetect:
             cv2.imwrite("capture/" + self.face_filename, frame)
 
         # call face api and get emotion string
-            self.result = self.face_api.detect_face_src('capture/' + self.face_filename)
+            self.result = self.face_api.detect_face_src(os.path.join('capture', self.face_filename))
             
             if self.result['exception'] != 'null':
                 print('[INFO] ' + self.result['exception'])
